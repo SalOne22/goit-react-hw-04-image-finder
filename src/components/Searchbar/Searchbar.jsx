@@ -1,3 +1,4 @@
+import { Component } from 'react';
 import {
   Header,
   SearchForm,
@@ -6,19 +7,31 @@ import {
   Input,
 } from './Searchbar.styled';
 
-export const Searchbar = ({ onSubmit }) => (
-  <Header>
-    <SearchForm onSubmit={onSubmit}>
-      <SubmitBtn type="submit">
-        <SubmitBtnLabel>Search</SubmitBtnLabel>
-      </SubmitBtn>
+export class Searchbar extends Component {
+  handleSubmit = evt => {
+    evt.preventDefault();
+    const value = evt.currentTarget.elements.query.value.trim();
 
-      <Input
-        type="text"
-        autocomplete="off"
-        autoFocus
-        placeholder="Search images and photos"
-      />
-    </SearchForm>
-  </Header>
-);
+    this.props.onSubmit(value);
+  };
+
+  render() {
+    return (
+      <Header>
+        <SearchForm onSubmit={this.handleSubmit}>
+          <SubmitBtn type="submit">
+            <SubmitBtnLabel>Search</SubmitBtnLabel>
+          </SubmitBtn>
+
+          <Input
+            type="text"
+            name="query"
+            autocomplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+          />
+        </SearchForm>
+      </Header>
+    );
+  }
+}
