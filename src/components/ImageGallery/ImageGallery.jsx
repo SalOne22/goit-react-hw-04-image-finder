@@ -1,10 +1,15 @@
 import { Gallery } from './ImageGallery.styled';
 import { ImageGalleryItem } from './ImageGalleryItem';
 
-export const ImageGallery = ({ images }) => (
+export const ImageGallery = ({ images, onImageClick }) => (
   <Gallery>
-    {images.map(({ id, src, alt }) => (
-      <ImageGalleryItem key={id} src={src} alt={alt} />
+    {images.map(({ id, webformatURL, tags }) => (
+      <ImageGalleryItem
+        onClick={() => onImageClick(id)}
+        key={id}
+        src={webformatURL}
+        alt={tags}
+      />
     ))}
   </Gallery>
 );

@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { createPortal } from 'react-dom';
 import { Overlay, ModalContainer } from './Modal.styled';
 
 export class Modal extends Component {
@@ -9,7 +10,7 @@ export class Modal extends Component {
   };
 
   handleEsc = evt => {
-    if (evt.keyCode !== 'Escape') return;
+    if (evt.code !== 'Escape') return;
 
     this.props.onClose();
   };
@@ -19,16 +20,17 @@ export class Modal extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener(this.handleEsc);
+    window.removeEventListener('keydown', this.handleEsc);
   }
 
   render() {
-    return (
+    return createPortal(
       <Overlay onClick={this.handleOverlayClick}>
         <ModalContainer>
           <img src={this.props.src} alt={this.props.alt} />
         </ModalContainer>
-      </Overlay>
+      </Overlay>,
+      document.getElementById('modal-root')
     );
   }
 }
