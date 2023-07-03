@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   Header,
   SearchForm,
@@ -8,6 +9,10 @@ import {
 } from './Searchbar.styled';
 
 export class Searchbar extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+  };
+
   handleSubmit = evt => {
     evt.preventDefault();
     const value = evt.currentTarget.elements.query.value.trim();
