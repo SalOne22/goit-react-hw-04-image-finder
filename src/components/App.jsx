@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { Container } from './App.styled';
 import { Searchbar } from './Searchbar';
 import { ImageGallery } from './ImageGallery';
@@ -9,90 +9,78 @@ import { Modal } from './Modal';
 
 const PAGE_SIZE = 12;
 
-export class App extends Component {
-  state = {
-    images: [],
-    query: '',
-    isLoading: false,
-    canLoadMore: true,
-    modalData: null,
-  };
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [canLoadMore, setCanLoadMore] = useState(true);
+  const [modalData, setModalData] = useState(null);
 
-  loadImages = async () => {
-    this.setState({
-      isLoading: true,
-    });
-
-    try {
-      const images = await fetchImages({
-        query: this.state.query,
-        page: this.state.images.length / PAGE_SIZE + 1,
-        per_page: PAGE_SIZE,
-      });
-
-      if (images.length < PAGE_SIZE) {
-        this.setState({
-          canLoadMore: false,
-        });
-      }
-
-      this.setState(prev => ({
-        images: [...prev.images, ...images],
-      }));
-    } catch (err) {
-      console.error(err);
-      this.setState({
-        canLoadMore: false,
-      });
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  };
-
-  handleSearch = value => {
+  const handleSearch = value => {
     if (value === '') return;
 
-    this.setState({ query: value });
+    setQuery(value);
+    setImages([]);
+    setCanLoadMore(true);
+    setPage(1);
   };
 
-  handleImageClick = id => {
-    this.setState(prevState => ({
-      modalData: prevState.images.find(image => image.id === id),
-    }));
+  const handleImageClick = id => {
+    setModalData(images.find(image => image.id === id));
   };
 
-  handleModalClose = () => {
-    this.setState({ modalData: null });
+  const handleModalClose = () => {
+    setModalData(null);
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.query !== this.state.query) {
-      this.setState({ images: [], canLoadMore: true }, this.loadImages);
-    }
-  }
+  useEffect(() => {
+    const loadImages = async () => {
+      setIsLoading(true);
 
-  render() {
-    const { images, canLoadMore, modalData, isLoading } = this.state;
+      try {
+        const images = await fetchImages({
+          query,
+          page,
+          per_page: PAGE_SIZE,
+        });
 
-    return (
-      <Container>
-        <Searchbar onSubmit={this.handleSearch} />
+        if (images.length < PAGE_SIZE) {
+          setCanLoadMore(false);
+        }
 
-        <ImageGallery images={images} onImageClick={this.handleImageClick} />
-        {isLoading && <Loader />}
+        setImages(prev => [...prev, ...images]);
+      } catch (err) {
+        console.error(err);
+        setCanLoadMore(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        {images.length !== 0 && canLoadMore && (
-          <Button onLoadMore={this.loadImages} />
-        )}
+    if (!query) return;
 
-        {modalData && (
-          <Modal
-            onClose={this.handleModalClose}
-            src={modalData.largeImageURL}
-            alt={modalData.tags}
-          />
-        )}
-      </Container>
-    );
-  }
-}
+    loadImages();
+  }, [page, query]);
+
+  return (
+    <Container>
+      <Searchbar onSubmit={handleSearch} />
+
+      <ImageGallery images={images} onImageClick={handleImageClick} />
+      {isLoading && <Loader />}
+
+      {images.length !== 0 && canLoadMore && (
+        <Button onLoadMore={() => setPage(prev => prev + 1)} />
+      )}
+
+      {modalData && (
+        <Modal
+          onClose={handleModalClose}
+          src={modalData.largeImageURL}
+          alt={modalData.tags}
+        />
+      )}
+    </Container>
+  );
+};
