@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   Header,
@@ -8,35 +7,33 @@ import {
   Input,
 } from './Searchbar.styled';
 
-export class Searchbar extends Component {
-  static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-  };
-
-  handleSubmit = evt => {
+export const Searchbar = ({ onSubmit }) => {
+  const handleSubmit = evt => {
     evt.preventDefault();
     const value = evt.currentTarget.elements.query.value.trim();
 
-    this.props.onSubmit(value);
+    onSubmit(value);
   };
 
-  render() {
-    return (
-      <Header>
-        <SearchForm onSubmit={this.handleSubmit}>
-          <SubmitBtn type="submit">
-            <SubmitBtnLabel>Search</SubmitBtnLabel>
-          </SubmitBtn>
+  return (
+    <Header>
+      <SearchForm onSubmit={handleSubmit}>
+        <SubmitBtn type="submit">
+          <SubmitBtnLabel>Search</SubmitBtnLabel>
+        </SubmitBtn>
 
-          <Input
-            type="text"
-            name="query"
-            autocomplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-          />
-        </SearchForm>
-      </Header>
-    );
-  }
-}
+        <Input
+          type="text"
+          name="query"
+          autocomplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+        />
+      </SearchForm>
+    </Header>
+  );
+};
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
